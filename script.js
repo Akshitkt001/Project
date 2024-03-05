@@ -10,7 +10,7 @@ async function processVideo() {
 
     const uploadProgress = document.getElementById('uploadProgress');
 
-    const response = await fetch('sdsdsdswd', {
+    const response = await fetch('app.py', {
         method: 'POST',
         body: formData,
         headers: {
