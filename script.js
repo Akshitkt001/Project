@@ -10,9 +10,12 @@ async function processVideo() {
 
     const uploadProgress = document.getElementById('uploadProgress');
 
-    const response = await fetch('/process_video', {
+    const response = await fetch('sdsdsdswd', {
         method: 'POST',
         body: formData,
+        headers: {
+            'Accept': 'application/json',
+        },
         onUploadProgress: (progressEvent) => {
             const { loaded, total } = progressEvent;
             uploadProgress.value = (loaded / total) * 100;
