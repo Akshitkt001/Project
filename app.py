@@ -37,12 +37,16 @@ def transcribe_and_translate_audio(audio_path, target_language='en'):
         print(f"Could not request results from Google Speech Recognition service; {e}")
         return ""
 
+def process_video(video_path):
+    # Process video here (Example: just return the input video path)
+    return video_path
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/process_video', methods=['POST'])
-def process_video():
+def process_video_route():
     video_file = request.files['video']
     video_file.save('input_video.mp4')
 
@@ -50,22 +54,10 @@ def process_video():
     if not os.path.exists(input_video_path):
         return jsonify({'error': 'File not found.'})
 
-    subprocess.run(["ffmpeg", "-i", input_video_path, "-c:v", "copy", "only_video.mp4"])
-    subprocess.run(["ffmpeg", "-i", input_video_path, "-vn", "-acodec", "pcm_s16le", "-ar", "44100", "only_audio.wav"])
-    cleaned_audio_file = remove_background_noise("only_audio.wav")
+    # Simulating video processing (replace with actual processing logic)
+    processed_video_path = process_video(input_video_path)
 
-    # Process audio and transcribe
-    recognizer = sr.Recognizer()
-    with sr.AudioFile(cleaned_audio_file) as source:
-        audio_data = recognizer.record(source)
-    try:
-        text = recognizer.recognize_google(audio_data)
-        translated_text = transcribe_and_translate_audio(cleaned_audio_file, target_language='hi')
-        return jsonify({'message': translated_text})
-    except sr.UnknownValueError:
-        return jsonify({'error': 'Speech Recognition could not understand audio'})
-    except sr.RequestError as e:
-        return jsonify({'error': f'Could not request results from Google Speech Recognition service; {e}'})
+    return jsonify({'message': 'Video processing complete.', 'video_url': processed_video_path})
 
 if __name__ == '__main__':
     app.run(debug=True)
