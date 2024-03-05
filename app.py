@@ -1,11 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+# backend.py
+
+from flask import Flask, request, jsonify
 from pydub import AudioSegment
+import noisereduce as nr
 import speech_recognition as sr
 from translate import Translator
-import noisereduce as nr
-import moviepy.editor as mp
-import subprocess
-import os
 
 app = Flask(__name__)
 
@@ -31,33 +30,25 @@ def transcribe_and_translate_audio(audio_path, target_language='en'):
         translated_text = translator.translate(text)
         return translated_text
     except sr.UnknownValueError:
-        print("Speech Recognition could not understand audio")
-        return ""
+        return "Speech Recognition could not understand audio"
     except sr.RequestError as e:
-        print(f"Could not request results from Google Speech Recognition service; {e}")
-        return ""
+        return f"Could not request results from Google Speech Recognition service; {e}"
 
-def process_video(video_path):
-    # Process video here (Example: just return the input video path)
-    return video_path
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
+# Define the route for processing video
 @app.route('/process_video', methods=['POST'])
-def process_video_route():
+def process_video():
+    # Handle file upload
+    if 'video' not in request.files:
+        return jsonify({'error': 'No file part'})
+    
     video_file = request.files['video']
     video_file.save('input_video.mp4')
 
-    input_video_path = 'input_video.mp4'
-    if not os.path.exists(input_video_path):
-        return jsonify({'error': 'File not found.'})
+    # Processing logic
+    cleaned_audio_file = remove_background_noise("input_video.mp4")
+    transcription = transcribe_and_translate_audio(cleaned_audio_file, target_language='hi')
 
-    # Simulating video processing (replace with actual processing logic)
-    processed_video_path = process_video(input_video_path)
-
-    return jsonify({'message': 'Video processing complete.', 'video_url': processed_video_path})
+    return jsonify({'message': 'Video processing complete.', 'transcription': transcription})
 
 if __name__ == '__main__':
     app.run(debug=True)
