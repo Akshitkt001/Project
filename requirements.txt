@@ -1,0 +1,6 @@
+Flask
+pydub
+SpeechRecognition
+translate
+noisereduce
+moviepy
