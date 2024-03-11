@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Video</title>
+</head>
+<body>
+    <h1>Upload Video</h1>
+    <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" id="file">
+        <input type="submit" value="Upload">
+    </form>
+    <div id="progress" style="display: none;">
+        <progress id="progress_bar" value="0" max="100"></progress>
+        <p id="progress_percent">0%</p>
+    </div>
+    <script>
+        document.querySelector('form').addEventListener('submit', function(){
+            document.getElementById('progress').style.display = 'block';
+        });
+        const progress_bar = document.getElementById('progress_bar');
+        const progress_percent = document.getElementById('progress_percent');
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event){
+            event.preventDefault();
+            const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload');
+            xhr.upload.addEventListener('progress', function(event){
+                if (event.lengthComputable) {
+                    const percent = (event.loaded / event.total) * 100;
+                    progress_bar.value = percent;
+                    progress_percent.innerText = Math.round(percent) + '%';
+                }
+            });
+            xhr.addEventListener('load', function(event){
+                progress_bar.value = 100;
+                progress_percent.innerText = '100%';
+            });
+            xhr.send(formData);
+        });
+    </script>
+</body>
+</html>
