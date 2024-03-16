@@ -1,6 +1,10 @@
-Flask
-pydub
+ffmpeg
 SpeechRecognition
 translate
-noisereduce
+TTS
 moviepy
+pydub
+noisereduce
+torch
+flask
+
